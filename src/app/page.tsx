@@ -23,7 +23,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    let interval = undefined
+    let interval: string | number | NodeJS.Timeout | undefined = undefined
     if (isActive) {
       interval = setInterval(() => {
         setSeconds(seconds => seconds - 1)
@@ -42,7 +42,7 @@ export default function Home() {
   const [isSWActive, setSWActive] = useState(false)
   const [sWSeconds, setSWSeconds] = useState(0)
   useEffect(() => {
-    let interval = undefined
+    let interval: string | number | NodeJS.Timeout | undefined = undefined
     if (isSWActive) {
       interval = setInterval(() => {
         setSWSeconds(sWSeconds => sWSeconds + 1)
