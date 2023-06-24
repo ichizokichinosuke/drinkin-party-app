@@ -5,27 +5,12 @@ import React, { useEffect, useState } from "react"
 import PlusSvg from "@/components/plusSvg"
 import MinusSvg from "@/components/minusSvg"
 import TimeBarSvg from "@/components/timeBarSvg"
+import { INIT_SECONDS } from "@/lib/constants"
 
 export default function Home() {
 
-  // カウントダウンバー
-  const [animationClass, setAnimationClass] = useState("")
-  const startAnimation = () => {
-    setAnimationClass("shrink")
-  }
-
-  useEffect(() => {
-    if (animationClass == "shrink") {
-      const timer = setTimeout(() => {
-        setAnimationClass("")
-      }, 1200000)
-      return () => clearTimeout(timer)
-    }
-  }, [animationClass])
-
   // カウントダウンタイマー
-  const defaultSeconds = 60 * 20
-  const [seconds, setSeconds] = useState(defaultSeconds)
+  const [seconds, setSeconds] = useState(INIT_SECONDS)
   const [isActive, setIsActive] = useState(false)
 
   function toggle() {
@@ -33,7 +18,7 @@ export default function Home() {
   }
 
   function reset() {
-    setSeconds(defaultSeconds)
+    setSeconds(INIT_SECONDS)
   }
 
   useEffect(() => {
@@ -68,11 +53,21 @@ export default function Home() {
     return () => clearInterval(interval)
   }, [isSWActive, sWSeconds])
 
+  function handleSW() {
+    if (typeof window !== "undefined") {
+      const nowTime = (new Date()).getTime()
+        localStorage.setItem("elapsedSeconds", nowTime.toString())
+    }
+    setSWActive(true)
+  }
+
+  // 杯数管理
   const [countM, setCountM] = useState(0)
   const [countA, setCountA] = useState(0)
   const keyM = "countM"
   const keyA = "countA"
 
+  // ブラウザリロード時にフック
   // 起動時にlocalStorageにデータが存在していればset
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -82,14 +77,15 @@ export default function Home() {
       if (savedCountM) setCountM(Number(savedCountM))
       if (savedCountA) setCountA(Number(savedCountA))
       if (elapsedSeconds) {
-        // const dateTime = Date.parse(elapsedSeconds)
-
-        setSWSeconds(Number(elapsedSeconds))
+        // elaplseSeconds: ms
+        const nowTime = (new Date()).getTime()
+        setSWSeconds(Math.round((nowTime - Number(elapsedSeconds)) / 1000))
+        setSWActive(true)
       }
     }
   }, [])
 
-  // 変更を起点にlocalStorageにset
+  // count変数の変更をフックにlocalStorageにset
   useEffect(() => {
     if (typeof window !== "undefined") {
       localStorage.setItem(keyM, countM.toString())
@@ -100,22 +96,13 @@ export default function Home() {
       localStorage.setItem(keyA, countA.toString())
     }
   }, [countA])
-  // useEffect(() => {
-  //   if (typeof window !== "undefined") {
-  //     localStorage.setItem("elapsedSeconds", (new Date()).toString())
-  //   }
-  // }, [sWSeconds])
 
-
-  const mx = 6
-  const boxSize = 24
-  const svgSize = 24
   const bgColor = "slate-100"
   const textColor = "text-sky-500"
 
   return (
     <main>
-      <TimeBarSvg animationClass={seconds}/>
+      <TimeBarSvg seconds={seconds}/>
       <section className={`flex min-h-screen flex-col items-center justify-between p-12 bg-${bgColor}`}>
         <h2 className={`${textColor} text-[202px] font-bold`}>
           {Math.floor(seconds / 60).toString().padStart(2,"0")}:{(seconds % 60).toString().padStart(2,"0")}
@@ -126,8 +113,8 @@ export default function Home() {
             <div onClick={() => {
                 setCountM(countM+1)
                 setIsActive(true)
-                startAnimation()
                 reset()
+                handleSW()
               }} className="mx-3">
               <PlusSvg />
             </div>
@@ -143,7 +130,7 @@ export default function Home() {
                 setCountA(countA+1)
                 setIsActive(true)
                 reset()
-                setSWActive(true)
+                handleSW()
               }} className="mx-3">
               <PlusSvg />
             </div>
