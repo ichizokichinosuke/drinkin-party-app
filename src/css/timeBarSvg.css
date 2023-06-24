@@ -1,0 +1,23 @@
+@keyframes shrinkAnimation {
+    from {
+        width: 1194px;
+        viewBox: 0px 0px 1194px 18px;
+        /* width: rect("1194"); */
+        /* d: path('M0 2C0 0.89543 0.895431 0 2 0H1192C1193.1 0 1194 0.895431 1194 2V18H0V2Z'); */
+
+    }
+    to {
+        width: 0;
+        viewBox: 0px 0px 0px 18px;
+        /* d: path('M0 2C0 0.89543 0.895431 0 2 0H1192C1193.1 0 0 0.895431 0 2V18H0V2Z'); */
+    }
+}
+
+/* .svg-container {
+    width: 1194px;
+    overflow: hidden;
+} */
+
+.shrink {
+    animation: shrinkAnimation 1200s linear;
+}
