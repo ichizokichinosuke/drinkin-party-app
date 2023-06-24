@@ -6,6 +6,7 @@ import PlusSvg from "@/components/plusSvg"
 import MinusSvg from "@/components/minusSvg"
 import TimeBarSvg from "@/components/timeBarSvg"
 import { INIT_SECONDS } from "@/lib/constants"
+import { alermDisplay, stopWatchDisplay } from "@/services/timeDisplay"
 
 export default function Home() {
 
@@ -55,8 +56,10 @@ export default function Home() {
 
   function handleSW() {
     if (typeof window !== "undefined") {
-      const nowTime = (new Date()).getTime()
+      if (!localStorage.getItem("elapsedSeconds")) {
+        const nowTime = (new Date()).getTime()
         localStorage.setItem("elapsedSeconds", nowTime.toString())
+      }
     }
     setSWActive(true)
   }
@@ -100,22 +103,24 @@ export default function Home() {
   const bgColor = "slate-100"
   const textColor = "text-sky-500"
 
+  function plusButtonOnClick(count: number, setCount: { (value: React.SetStateAction<number>): void; (value: React.SetStateAction<number>): void; (arg0: number): void }) {
+    setCount(count+1)
+    setIsActive(true)
+    reset()
+    handleSW()
+  }
+
   return (
     <main>
       <TimeBarSvg seconds={seconds}/>
       <section className={`flex min-h-screen flex-col items-center justify-between p-12 bg-${bgColor}`}>
         <h2 className={`${textColor} text-[202px] font-bold`}>
-          {Math.floor(seconds / 60).toString().padStart(2,"0")}:{(seconds % 60).toString().padStart(2,"0")}
+          {alermDisplay(seconds)}
         </h2>
         <section>
           <div className="flex flex-row items-center justify-between mb-14">
             <h3 className="text-6xl font-bold mr-10">宮薗</h3>
-            <div onClick={() => {
-                setCountM(countM+1)
-                setIsActive(true)
-                reset()
-                handleSW()
-              }} className="mx-3">
+            <div onClick={() => plusButtonOnClick(countM, setCountM)} className="mx-3">
               <PlusSvg />
             </div>
             <strong className={`${textColor} text-6xl font-bold mx-6`}>{countM}</strong>
@@ -126,12 +131,7 @@ export default function Home() {
           </div>
           <div className="flex flex-row items-center justify-between mb-14">
             <h3 className="text-6xl font-bold mr-10">阿多</h3>
-            <div onClick={() => {
-                setCountA(countA+1)
-                setIsActive(true)
-                reset()
-                handleSW()
-              }} className="mx-3">
+            <div onClick={() => plusButtonOnClick(countA, setCountA)} className="mx-3">
               <PlusSvg />
             </div>
             <strong className={`${textColor} text-6xl font-bold mx-6`}>{countA}</strong>
@@ -144,9 +144,7 @@ export default function Home() {
         <section className="mb-10">
           <div className="flex flex-col items-center">
             <h4 className={`text-6xl ${textColor} font-bold mb-4`}>
-              {Math.floor(sWSeconds / 3600).toString().padStart(2,"0")}:
-              {Math.floor(sWSeconds / 60).toString().padStart(2,"0")}:
-              {(sWSeconds % 60).toString().padStart(2,"0")}
+              {stopWatchDisplay(sWSeconds)}
             </h4>
             <h4 className={`text-4xl ${textColor} font-bold`}>経過</h4>
           </div>
